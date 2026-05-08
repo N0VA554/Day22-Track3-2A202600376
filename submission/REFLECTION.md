@@ -1,7 +1,7 @@
 # Reflection — Lab 22 (DPO/ORPO Alignment)
 
-**Tên:** _Nguyen Van A_
-**Cohort:** _A20-K1_
+**Tên:** Le Ha An
+**Cohort:** _A20_
 **Tier đã chạy:** _T4_
 **Date:** _2026-05-08_
 
