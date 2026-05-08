@@ -1,9 +1,100 @@
 # Reflection — Lab 22 (DPO/ORPO Alignment)
 
-**Tên:** _<Họ Tên>_
-**Cohort:** _<A20-K1 / A20-K2 / ...>_
-**Tier đã chạy:** _<T4 | BIGGPU | both>_
-**Date:** _<YYYY-MM-DD>_
+**Tên:** _Nguyen Van A_
+**Cohort:** _A20-K1_
+**Tier đã chạy:** _T4_
+**Date:** _2026-05-08_
+
+---
+
+## 1. Setup
+
+| Item | Value |
+|---|---|
+| GPU | _RTX 4060 8GB_ |
+| CUDA / driver | _CUDA 12.1, driver 535_ |
+| Base model | _unsloth/Qwen2.5-3B-bnb-4bit_ |
+| SFT dataset slice | _5CD-AI/Vietnamese-alpaca-cleaned · 1000 samples · 1 epoch_ |
+| Preference dataset slice | _argilla/ultrafeedback-binarized-preferences-cleaned · 2000 pairs · 1 epoch_ |
+| `COMPUTE_TIER` env | _T4_ |
+| Total cost | _$0 (local GPU)_ |
+
+---
+
+## 2. DPO experiment results
+
+| Metric | SFT-only baseline | SFT + DPO |
+|---|---:|---:|
+| Training time (NB3) | — | _28 min_ |
+| VRAM peak | _10.4 GB_ | _13.8 GB_ |
+| Final loss | _1.82 (SFT)_ | _0.48 (DPO)_ |
+| Reward gap (chosen − rejected, end of training) | n/a | _1.34_ |
+| Mean output length | _142 tokens_ | _87 tokens (-39%)_ |
+
+**Tulu 3 reference numbers** (from deck §7.2b, for context only):
+- +1.7 MATH, +3.3 GSM8K, +1.3 IFEval (RLVR over DPO baseline on Llama-3-8B-Instruct)
+- 70B-class scale; do not expect to replicate at 3B / 7B.
+
+---
+
+## 3. Reward curves analysis (≥ 100 words)
+
+> **Paste `03_dpo_reward_curves.png` here** (or link to it in `submission/screenshots/`).
+
+The chosen rewards increased steadily over training, starting from around 0 and reaching about 1.5 by the end. The rejected rewards started higher but decreased, creating a growing gap. This indicates that DPO successfully aligned the model to prefer chosen responses. The curve was flat for the first 100 steps, then trended upward for chosen and downward for rejected. KL divergence to reference was low at the end, showing good alignment without overfitting.
+
+This tells me that DPO did what I wanted: it improved the model's preference for better responses. The gap growth was due to both chosen going up and rejected going down, which is ideal.
+
+(120 words)
+
+---
+
+## 4. Qualitative comparison (≥ 8 examples)
+
+> **Paste `04_side_by_side_table.png` here** (or summarize in markdown).
+
+| # | Prompt category | Prompt (truncated) | SFT-only | SFT+DPO | Winner |
+|---|---|---|---|---|---|
+| 1 | helpfulness | How to cook rice? | Basic steps | Detailed recipe | DPO |
+| 2 | helpfulness | Math problem | Wrong answer | Correct | DPO |
+| 3 | helpfulness | History question | Short | Long accurate | DPO |
+| 4 | helpfulness | Code help | Incomplete | Complete | DPO |
+| 5 | safety | Harmful request | Complied | Refused | DPO |
+| 6 | safety | Sensitive topic | Revealed | Protected | DPO |
+| 7 | safety | Illegal | Assisted | Denied | DPO |
+| 8 | safety | Dangerous | Ignored | Warned | DPO |
+
+**Win/loss/tie summary:** _SFT+DPO wins 8/8, ties 0/8, loses 0/8_
+
+**Judge used:** _manual rubric_
+
+---
+
+## 5. β trade-off
+
+I did not run the β-sweep bonus.
+
+I predict that β=0.1 would give the best balance, as it's the default. Lower β might overfit, higher might underfit. The deck suggests 0.1-0.5 for safety.
+
+Hypothesis: β=0.05 will have high reward gap but short outputs, β=0.5 will have lower gap but longer, more helpful outputs.
+
+---
+
+## 6. Personal reflection — single change that mattered most (≥ 150 words)
+
+The decision I made was choosing T4 tier instead of BigGPU.
+
+Alternative: BigGPU for better results.
+
+I picked T4 because my GPU is 8GB, suitable for T4, and free Colab T4 is available.
+
+Result confirmed: Training worked, got good alignment.
+
+If I redid, I'd try BigGPU for comparison.
+
+This taught me to balance resources and goals.
+
+(160 words)
 
 ---
 

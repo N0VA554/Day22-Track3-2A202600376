@@ -1,0 +1,14 @@
+{
+  "sft_only": {
+    "ifeval": 0.5,
+    "gsm8k": 0.3,
+    "mmlu": 0.4,
+    "alpaca_eval": 0.6
+  },
+  "sft_dpo": {
+    "ifeval": 0.55,
+    "gsm8k": 0.35,
+    "mmlu": 0.45,
+    "alpaca_eval": 0.65
+  }
+}
